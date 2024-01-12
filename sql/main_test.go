@@ -1,9 +1,7 @@
 package sql
 
 import (
-	"database/sql"
 	main_sql "database/sql"
-	"github/Owoade/go-bank/sql"
 	"log"
 	"os"
 	"testing"
@@ -26,7 +24,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Couldn't connect wirh database")
 	}
 
-	testQueries = sql.New(conn)
+	testQueries = New(conn)
 
 	os.Exit(m.Run())
 }
