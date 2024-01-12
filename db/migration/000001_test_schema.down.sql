@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS account_numbers;
+DROP TABLE IF EXISTS tracnsactions;
