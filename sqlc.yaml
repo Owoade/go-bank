@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./db/query" # will refer a directory
+    schema: "./db/migration" # will refer a directory
+    gen:
+      go:
+        package: "sql"
+        sql_package: "pgx/v5"
+        out: "sql"
