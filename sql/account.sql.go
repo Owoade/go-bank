@@ -37,6 +37,22 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 	return i, err
 }
 
+const getAccountById = `-- name: GetAccountById :one
+SELECT id, user_id, balance, created_at FROM "accounts" WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetAccountById(ctx context.Context, id int64) (Account, error) {
+	row := q.db.QueryRow(ctx, getAccountById, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getUserAccount = `-- name: GetUserAccount :one
 SELECT id, user_id, balance, created_at FROM "accounts" WHERE user_id = $1 LIMIT 1
 `
@@ -53,8 +69,8 @@ func (q *Queries) GetUserAccount(ctx context.Context, userID pgtype.Int4) (Accou
 	return i, err
 }
 
-const updateBalance = `-- name: UpdateBalance :exec
-UPDATE "accounts" SET balance = balance + $1 WHERE user_id = $2
+const updateBalance = `-- name: UpdateBalance :one
+UPDATE "accounts" SET balance = balance + $1 WHERE user_id = $2 RETURNING id, user_id, balance, created_at
 `
 
 type UpdateBalanceParams struct {
@@ -62,7 +78,14 @@ type UpdateBalanceParams struct {
 	UserID  pgtype.Int4
 }
 
-func (q *Queries) UpdateBalance(ctx context.Context, arg UpdateBalanceParams) error {
-	_, err := q.db.Exec(ctx, updateBalance, arg.Balance, arg.UserID)
-	return err
+func (q *Queries) UpdateBalance(ctx context.Context, arg UpdateBalanceParams) (Account, error) {
+	row := q.db.QueryRow(ctx, updateBalance, arg.Balance, arg.UserID)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
 }

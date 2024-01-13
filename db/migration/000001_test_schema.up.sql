@@ -4,7 +4,7 @@ CREATE TYPE "transaction_status" AS ENUM (
 );
 
 CREATE TABLE "users" (
-  "id" integer PRIMARY KEY,
+  "id" serial PRIMARY KEY,
   "email" varchar,
   "password" text,
   "created_at" timestamptz NOT NULL DEFAULT (now())

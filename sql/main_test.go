@@ -1,11 +1,13 @@
 package sql
 
 import (
-	main_sql "database/sql"
 	"log"
 	"os"
 	"testing"
 
+	"context"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
 
@@ -18,13 +20,13 @@ var testQueries *Queries
 
 func TestMain(m *testing.M) {
 
-	conn, err := main_sql.Open(dbDriver, dbSource)
+	connPool, err := pgxpool.New(context.Background(), dbSource)
 
 	if err != nil {
 		log.Fatal("Couldn't connect wirh database")
 	}
 
-	testQueries = New(conn)
+	testQueries = New(connPool)
 
 	os.Exit(m.Run())
 }
