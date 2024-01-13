@@ -1,4 +1,4 @@
-package sql
+package sql_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/Owoade/go-bank/sql"
 	"github.com/Owoade/go-bank/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -14,9 +15,9 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 
-	arg := CreateAccountParams{
+	arg := sql.CreateAccountParams{
 		UserID: pgtype.Int4{
-			Int32: 1,
+			Int32: 2,
 			Valid: true,
 		},
 		Balance: pgtype.Numeric{
@@ -49,15 +50,12 @@ func TestGetUserAccount(t *testing.T) {
 
 }
 
-func TestUpdateBalance(t *testing.T) {
+func TestCreditAccount(t *testing.T) {
 
 	randomAmount := utils.GenerateRandomInteger(3)
 
-	payload := UpdateBalanceParams{
-		UserID: pgtype.Int4{
-			Int32: 1,
-			Valid: true,
-		},
+	payload := sql.CreditAccountParams{
+		ID: 1,
 		Balance: pgtype.Numeric{
 			Int:   randomAmount,
 			Valid: true,
@@ -66,7 +64,7 @@ func TestUpdateBalance(t *testing.T) {
 
 	existingAccount, e_err := testQueries.GetAccountById(context.Background(), 1)
 
-	updatedAccount, err := testQueries.UpdateBalance(context.Background(), payload)
+	updatedAccount, err := testQueries.CreditAccount(context.Background(), payload)
 
 	fmt.Println(existingAccount.Balance.Int, updatedAccount.Balance.Int)
 	if e_err != nil {

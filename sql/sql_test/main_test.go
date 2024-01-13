@@ -1,4 +1,4 @@
-package sql
+package sql_test
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 
 	"context"
 
+	"github.com/Owoade/go-bank/sql"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
@@ -16,7 +17,7 @@ const (
 	dbSource = "postgres://root:secret@localhost:5432/bank-app?sslmode=disable"
 )
 
-var testQueries *Queries
+var testQueries *sql.Queries
 
 func TestMain(m *testing.M) {
 
@@ -26,7 +27,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Couldn't connect wirh database")
 	}
 
-	testQueries = New(connPool)
+	testQueries = sql.New(connPool)
 
 	os.Exit(m.Run())
 }

@@ -1,4 +1,4 @@
-package sql
+package sql_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/Owoade/go-bank/sql"
 	"github.com/Owoade/go-bank/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -55,13 +56,13 @@ func TestGetUserAccountNumbers(t *testing.T) {
 
 }
 
-func generateRandomAccountNumbers(t *testing.T, n int, accountId pgtype.Int4) ([]AccountNumber, error) {
+func generateRandomAccountNumbers(t *testing.T, n int, accountId pgtype.Int4) ([]sql.AccountNumber, error) {
 
-	accountNumbers := make([]AccountNumber, 0, n)
+	accountNumbers := make([]sql.AccountNumber, 0, n)
 
 	for i := 1; i <= n; i++ {
 
-		payload := CreateAccountNumberParams{
+		payload := sql.CreateAccountNumberParams{
 			AccountID: pgtype.Int4{
 				Int32: 1,
 				Valid: true,

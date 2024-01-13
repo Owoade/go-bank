@@ -1,4 +1,4 @@
-package sql
+package sql_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/Owoade/go-bank/sql"
 	"github.com/Owoade/go-bank/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -19,7 +20,7 @@ func TestCreateUser(t *testing.T) {
 		log.Fatal("Passsword hashing failed:", err)
 	}
 
-	arg := CreateUserParams{
+	arg := sql.CreateUserParams{
 		Email: pgtype.Text{
 			String: fmt.Sprintf("%s%s", utils.GenerateRandomString(8), "@go-bank.com"),
 			Valid:  true,

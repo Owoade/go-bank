@@ -12,5 +12,8 @@ SELECT * FROM "accounts" WHERE user_id = $1 LIMIT 1;
 -- name: GetAccountById :one
 SELECT * FROM "accounts" WHERE id = $1 LIMIT 1;
 
--- name: UpdateBalance :one
-UPDATE "accounts" SET balance = balance + $1 WHERE user_id = $2 RETURNING *; 
+-- name: CreditAccount :one
+UPDATE "accounts" SET balance = balance + $1 WHERE id = $2 RETURNING *; 
+
+-- name: DebitAccount :one 
+UPDATE "accounts" SET balance = balance - $1 WHERE id = $2 RETURNING *;

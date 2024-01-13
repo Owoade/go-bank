@@ -37,6 +37,48 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 	return i, err
 }
 
+const creditAccount = `-- name: CreditAccount :one
+UPDATE "accounts" SET balance = balance + $1 WHERE id = $2 RETURNING id, user_id, balance, created_at
+`
+
+type CreditAccountParams struct {
+	Balance pgtype.Numeric
+	ID      int64
+}
+
+func (q *Queries) CreditAccount(ctx context.Context, arg CreditAccountParams) (Account, error) {
+	row := q.db.QueryRow(ctx, creditAccount, arg.Balance, arg.ID)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const debitAccount = `-- name: DebitAccount :one
+UPDATE "accounts" SET balance = balance - $1 WHERE id = $2 RETURNING id, user_id, balance, created_at
+`
+
+type DebitAccountParams struct {
+	Balance pgtype.Numeric
+	ID      int64
+}
+
+func (q *Queries) DebitAccount(ctx context.Context, arg DebitAccountParams) (Account, error) {
+	row := q.db.QueryRow(ctx, debitAccount, arg.Balance, arg.ID)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getAccountById = `-- name: GetAccountById :one
 SELECT id, user_id, balance, created_at FROM "accounts" WHERE id = $1 LIMIT 1
 `
@@ -59,27 +101,6 @@ SELECT id, user_id, balance, created_at FROM "accounts" WHERE user_id = $1 LIMIT
 
 func (q *Queries) GetUserAccount(ctx context.Context, userID pgtype.Int4) (Account, error) {
 	row := q.db.QueryRow(ctx, getUserAccount, userID)
-	var i Account
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.Balance,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const updateBalance = `-- name: UpdateBalance :one
-UPDATE "accounts" SET balance = balance + $1 WHERE user_id = $2 RETURNING id, user_id, balance, created_at
-`
-
-type UpdateBalanceParams struct {
-	Balance pgtype.Numeric
-	UserID  pgtype.Int4
-}
-
-func (q *Queries) UpdateBalance(ctx context.Context, arg UpdateBalanceParams) (Account, error) {
-	row := q.db.QueryRow(ctx, updateBalance, arg.Balance, arg.UserID)
 	var i Account
 	err := row.Scan(
 		&i.ID,
