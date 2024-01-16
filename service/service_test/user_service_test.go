@@ -40,6 +40,8 @@ func TestTransferCash(t *testing.T) {
 
 	require.NoError(t, err)
 
+	fmt.Println(result.Sender.Balance.Int, arg.Amount)
+
 	require.Equal(t, result.CreditTransaction.Type.TransactionStatus, sql.TransactionStatus("credit"))
 	require.Equal(t, result.CreditTransaction.AccountID.Int32, int32(arg.ToAccountId))
 
