@@ -2,7 +2,6 @@ package sql_test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/big"
 	"testing"
@@ -15,9 +14,13 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 
+	ctx := context.Background()
+
+	user := sqlSeeders.User()
+
 	arg := sql.CreateAccountParams{
 		UserID: pgtype.Int4{
-			Int32: 2,
+			Int32: user.ID,
 			Valid: true,
 		},
 		Balance: pgtype.Numeric{
@@ -26,7 +29,7 @@ func TestCreateAccount(t *testing.T) {
 		},
 	}
 
-	account, err := testQueries.CreateAccount(context.Background(), arg)
+	account, err := testQueries.CreateAccount(ctx, arg)
 
 	require.NoError(t, err)
 	require.Equal(t, arg.Balance, account.Balance)
@@ -54,23 +57,19 @@ func TestCreditAccount(t *testing.T) {
 
 	randomAmount := utils.GenerateRandomInteger(3)
 
+	user := sqlSeeders.User()
+
+	account := sqlSeeders.Account(user.ID)
+
 	payload := sql.CreditAccountParams{
-		ID: 1,
+		ID: account.ID,
 		Balance: pgtype.Numeric{
 			Int:   randomAmount,
 			Valid: true,
 		},
 	}
 
-	existingAccount, e_err := testQueries.GetAccountById(context.Background(), 1)
-
 	updatedAccount, err := testQueries.CreditAccount(context.Background(), payload)
-
-	fmt.Println(existingAccount.Balance.Int, updatedAccount.Balance.Int)
-	if e_err != nil {
-		fmt.Println(e_err)
-		log.Fatal("get account query failed")
-	}
 
 	if err != nil {
 		log.Fatal("update account query failed")
@@ -78,12 +77,14 @@ func TestCreditAccount(t *testing.T) {
 
 	updatedAccountBalance := updatedAccount.Balance.Int
 
-	existingAccountBalance := existingAccount.Balance.Int
+	existingAccountBalance := account.Balance.Int
 
 	balanceDifference := new(big.Int).Sub(updatedAccountBalance, existingAccountBalance)
 
 	require.NoError(t, err)
 
 	require.Equal(t, randomAmount, balanceDifference)
+
+	require.Equal(t, account.ID, updatedAccount.ID)
 
 }

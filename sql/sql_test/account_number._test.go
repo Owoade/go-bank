@@ -1,32 +1,20 @@
 package sql_test
 
 import (
-	"context"
-	"fmt"
-	"log"
 	"testing"
 
-	"github.com/Owoade/go-bank/sql"
-	"github.com/Owoade/go-bank/utils"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateAccountnumber(t *testing.T) {
 
-	accountId := pgtype.Int4{
-		Int32: 1,
-		Valid: true,
-	}
+	user := sqlSeeders.User()
 
-	accountNumbers, err := generateRandomAccountNumbers(t, 4, accountId)
+	account := sqlSeeders.Account(user.ID)
 
-	if err != nil {
-		log.Fatal("error creating account numbers")
-	}
+	accountNumbers := sqlSeeders.AccountNumbers(int32(account.ID), 5)
 
-	require.NoError(t, err)
-	require.Len(t, accountNumbers, 4)
+	require.Len(t, accountNumbers, 5)
 
 	for i := 0; i < len(accountNumbers); i++ {
 
@@ -34,63 +22,8 @@ func TestCreateAccountnumber(t *testing.T) {
 
 		require.NotEmpty(t, accountNumber)
 
-	}
-
-}
-
-func TestGetUserAccountNumbers(t *testing.T) {
-
-	accountId := pgtype.Int4{
-		Int32: 1,
-		Valid: true,
-	}
-
-	accountNumbers, err := generateRandomAccountNumbers(t, 5, accountId)
-
-	if err != nil {
-		log.Fatal("error creating account numbers")
-	}
-
-	require.NoError(t, err)
-	require.Len(t, accountNumbers, 5)
-
-}
-
-func generateRandomAccountNumbers(t *testing.T, n int, accountId pgtype.Int4) ([]sql.AccountNumber, error) {
-
-	accountNumbers := make([]sql.AccountNumber, 0, n)
-
-	for i := 1; i <= n; i++ {
-
-		payload := sql.CreateAccountNumberParams{
-			AccountID: pgtype.Int4{
-				Int32: 1,
-				Valid: true,
-			},
-			AccountName: pgtype.Text{
-				String: utils.GenerateRandomString(12),
-				Valid:  true,
-			},
-			AccountNumber: pgtype.Int8{
-				Int64: utils.GenerateRandomInteger(5).Int64(),
-				Valid: true,
-			},
-			BankName: pgtype.Text{
-				String: utils.GenerateRandomString(9),
-				Valid:  true,
-			},
-		}
-
-		accountNumber, err := testQueries.CreateAccountNumber(context.Background(), payload)
-
-		if err != nil {
-			return accountNumbers, fmt.Errorf("error creating account number %s", fmt.Sprint(i))
-		}
-
-		accountNumbers = append(accountNumbers, accountNumber)
+		require.Equal(t, accountNumber.AccountID.Int32, int32(account.ID))
 
 	}
-
-	return accountNumbers, nil
 
 }
