@@ -14,10 +14,18 @@ import (
 
 func TestTransferCash(t *testing.T) {
 
+	sender := sqlSeeders.User()
+
+	recipient := sqlSeeders.User()
+
+	fromAccount := sqlSeeders.Account(sender.ID)
+
+	toAccount := sqlSeeders.Account(recipient.ID)
+
 	arg := service.TransferCashParams{
-		ToAccountId:   1,
-		FromAccountId: 3,
-		Amount:        big.NewInt(10),
+		ToAccountId:   toAccount.ID,
+		FromAccountId: fromAccount.ID,
+		Amount:        big.NewInt(20),
 	}
 
 	result, err := testService.TransferCash(context.Background(), arg)
@@ -25,6 +33,10 @@ func TestTransferCash(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	creditTransactionAmount := *new(big.Int).Mul(result.CreditTransaction.Amount.Int, big.NewInt(10))
+
+	debitTransactionAmount := *new(big.Int).Mul(result.DebitTransaction.Amount.Int, big.NewInt(10))
 
 	require.NoError(t, err)
 
@@ -35,8 +47,8 @@ func TestTransferCash(t *testing.T) {
 	require.Equal(t, result.DebitTransaction.AccountID.Int32, int32(arg.FromAccountId))
 
 	fmt.Println(result.CreditTransaction.Amount.Int, arg.Amount, result.CreditTransaction.AccountID.Int32)
-	require.Equal(t, result.CreditTransaction.Amount.Int.Cmp(arg.Amount), 0)
-	require.Equal(t, result.DebitTransaction.Amount.Int.Cmp(arg.Amount), 0)
+	require.Equal(t, creditTransactionAmount.Cmp(arg.Amount), 0)
+	require.Equal(t, debitTransactionAmount.Cmp(arg.Amount), 0)
 
 	require.Equal(t, new(big.Int).Sub(result.Sender.Balance.Int, arg.Amount).Cmp(result.DebitedAccount.Balance.Int), 0)
 	require.Equal(t, new(big.Int).Add(result.Recipient.Balance.Int, arg.Amount).Cmp(result.CreditedAcccount.Balance.Int), 0)

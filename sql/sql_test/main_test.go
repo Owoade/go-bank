@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/Owoade/go-bank/sql"
+	"github.com/Owoade/go-bank/sql/seeders"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
@@ -19,6 +20,8 @@ const (
 
 var testQueries *sql.Queries
 
+var sqlSeeders *seeders.SeederStore
+
 func TestMain(m *testing.M) {
 
 	connPool, err := pgxpool.New(context.Background(), dbSource)
@@ -28,6 +31,8 @@ func TestMain(m *testing.M) {
 	}
 
 	testQueries = sql.New(connPool)
+
+	sqlSeeders = seeders.NewSeedStore(testQueries)
 
 	os.Exit(m.Run())
 }

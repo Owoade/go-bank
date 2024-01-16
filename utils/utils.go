@@ -4,9 +4,14 @@ import (
 	"crypto/rand"
 	"math/big"
 	math_rand "math/rand"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+func init() {
+	math_rand.Seed(time.Now().UnixNano())
+}
 
 func HashPassword(password string) (string, error) {
 

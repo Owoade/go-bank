@@ -10,6 +10,7 @@ import (
 
 	"github.com/Owoade/go-bank/service"
 	"github.com/Owoade/go-bank/sql"
+	"github.com/Owoade/go-bank/sql/seeders"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
@@ -22,6 +23,8 @@ const (
 var testQueries *sql.Queries
 
 var testService *service.Service
+
+var sqlSeeders *seeders.SeederStore
 
 func TestMain(m *testing.M) {
 
@@ -38,6 +41,8 @@ func TestMain(m *testing.M) {
 	fmt.Println(&testService.Store, "test service")
 
 	testQueries = sql.New(connPool)
+
+	sqlSeeders = seeders.NewSeedStore(testQueries)
 
 	os.Exit(m.Run())
 }
