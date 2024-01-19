@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math/big"
 	math_rand "math/rand"
 	"time"
@@ -62,5 +63,19 @@ func GetRandomValueFromSLice[T any](s []T) T {
 	index := math_rand.Intn(len(s))
 
 	return s[index]
+
+}
+
+func CompareHashedPassword(pass1, pass2 string) bool {
+
+	err := bcrypt.CompareHashAndPassword([]byte(pass1), []byte(pass2))
+
+	if err == nil {
+		return true
+	}
+
+	fmt.Println(err.Error())
+
+	return false
 
 }

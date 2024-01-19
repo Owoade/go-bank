@@ -1,58 +1,44 @@
 package service_test
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"math/big"
 	"testing"
 
-	"github.com/Owoade/go-bank/service"
-	"github.com/Owoade/go-bank/sql"
+	"github.com/Owoade/go-bank/utils"
 	"github.com/stretchr/testify/require"
 )
 
-func TestTransferCash(t *testing.T) {
+func TestLogin(t *testing.T) {
 
-	sender := sqlSeeders.User()
+	existingUser := sqlSeeders.User()
 
-	recipient := sqlSeeders.User()
+	successResponse, successErr := testService.Login(existingUser.Email.String, existingUser.RawPassword)
 
-	fromAccount := sqlSeeders.Account(sender.ID)
+	_, err := testService.Login(utils.GenerateRandomString(5), utils.GenerateRandomString(9))
 
-	toAccount := sqlSeeders.Account(recipient.ID)
+	require.Error(t, err)
+	require.NoError(t, successErr)
 
-	arg := service.TransferCashParams{
-		ToAccountId:   toAccount.ID,
-		FromAccountId: fromAccount.ID,
-		Amount:        big.NewInt(20),
-	}
+	require.NotEmpty(t, successResponse)
 
-	result, err := testService.TransferCash(context.Background(), arg)
+}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+func TestSignUp(t *testing.T) {
 
-	creditTransactionAmount := *new(big.Int).Mul(result.CreditTransaction.Amount.Int, big.NewInt(10))
+	existingUser := sqlSeeders.User()
 
-	debitTransactionAmount := *new(big.Int).Mul(result.DebitTransaction.Amount.Int, big.NewInt(10))
+	randomEmail := fmt.Sprintf("%s%s", utils.GenerateRandomString(8), "@go-bank.com")
 
-	require.NoError(t, err)
+	randomPassword := utils.GenerateRandomString(10)
 
-	fmt.Println(result.Sender.Balance.Int, arg.Amount)
+	successResponse, successErr := testService.SignUp(randomEmail, randomPassword)
 
-	require.Equal(t, result.CreditTransaction.Type.TransactionStatus, sql.TransactionStatus("credit"))
-	require.Equal(t, result.CreditTransaction.AccountID.Int32, int32(arg.ToAccountId))
+	_, err := testService.SignUp(existingUser.Email.String, existingUser.Password.String)
 
-	require.Equal(t, result.DebitTransaction.Type.TransactionStatus, sql.TransactionStatus("debit"))
-	require.Equal(t, result.DebitTransaction.AccountID.Int32, int32(arg.FromAccountId))
+	require.Error(t, err)
+	require.NoError(t, successErr)
 
-	fmt.Println(result.CreditTransaction.Amount.Int, arg.Amount, result.CreditTransaction.AccountID.Int32)
-	require.Equal(t, creditTransactionAmount.Cmp(arg.Amount), 0)
-	require.Equal(t, debitTransactionAmount.Cmp(arg.Amount), 0)
-
-	require.Equal(t, new(big.Int).Sub(result.Sender.Balance.Int, arg.Amount).Cmp(result.DebitedAccount.Balance.Int), 0)
-	require.Equal(t, new(big.Int).Add(result.Recipient.Balance.Int, arg.Amount).Cmp(result.CreditedAcccount.Balance.Int), 0)
+	require.Equal(t, successResponse.Email.String, randomEmail)
+	require.True(t, utils.CompareHashedPassword(successResponse.Password.String, randomPassword))
 
 }
