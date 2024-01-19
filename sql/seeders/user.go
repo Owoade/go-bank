@@ -10,9 +10,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (store *SeederStore) User() sql.User {
+type SeededUser struct {
+	sql.User
+	RawPassword string
+}
 
-	hashedPassword, err := utils.HashPassword("owoade anu")
+func (store *SeederStore) User() SeededUser {
+
+	randomPassword := utils.GenerateRandomString(10)
+
+	hashedPassword, err := utils.HashPassword(randomPassword)
 
 	if err != nil {
 		log.Fatal("Passsword hashing failed:", err)
@@ -35,6 +42,9 @@ func (store *SeederStore) User() sql.User {
 		log.Fatal("error seeding db with user")
 	}
 
-	return user
+	return SeededUser{
+		User:        user,
+		RawPassword: randomPassword,
+	}
 
 }
