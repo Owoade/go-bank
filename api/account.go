@@ -1,7 +1,6 @@
 package api
 
 import (
-	"math/big"
 	"net/http"
 
 	"github.com/Owoade/go-bank/service"
@@ -13,8 +12,8 @@ type CreateAccountParams struct {
 }
 
 type CreditAccountParams struct {
-	AccountId int64    `json:"accountId" binding:"required"`
-	Amount    *big.Int `json:"amount" binding:"required"`
+	AccountId int64 `json:"accountId" binding:"required"`
+	Amount    int64 `json:"amount" binding:"required"`
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {

@@ -38,19 +38,32 @@ func GenerateRandomString(length int) string {
 	return result
 }
 
-func GenerateRandomInteger(length int) *big.Int {
+func intPow(base, exp int) int {
+	result := 1
+	for exp > 0 {
+		if exp&1 == 1 {
+			result *= base
+		}
+		base *= base
+		exp >>= 1
+	}
+	return result
+}
+
+func generateRandomNumber(min, max int) int {
+	return math_rand.Intn(max-min+1) + min
+}
+
+func GenerateRandomInteger(length int) int64 {
 
 	if length <= 0 {
-		return *new(*big.Int)
+		return *new(int64)
 	}
 
-	max := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(length)), nil)
-	randomInt, err := rand.Int(rand.Reader, max)
-	if err != nil {
-		return nil
-	}
-
-	return randomInt
+	// Seed the random number generator with the current time
+	min := intPow(10, length-1)
+	max := intPow(10, length) - 1
+	return int64(generateRandomNumber(min, max))
 
 }
 
