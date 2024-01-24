@@ -21,7 +21,7 @@ func (store *SeederStore) AccountNumber(accountId int32) sql.AccountNumber {
 			Valid:  true,
 		},
 		AccountNumber: pgtype.Int8{
-			Int64: utils.GenerateRandomInteger(5).Int64(),
+			Int64: utils.GenerateRandomInteger(5),
 			Valid: true,
 		},
 		BankName: pgtype.Text{
