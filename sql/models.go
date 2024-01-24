@@ -56,7 +56,7 @@ func (ns NullTransactionStatus) Value() (driver.Value, error) {
 type Account struct {
 	ID        int64
 	UserID    pgtype.Int4
-	Balance   pgtype.Numeric
+	Balance   pgtype.Int8
 	CreatedAt pgtype.Timestamptz
 }
 
@@ -72,7 +72,7 @@ type AccountNumber struct {
 type Transaction struct {
 	ID        int64
 	AccountID pgtype.Int4
-	Amount    pgtype.Numeric
+	Amount    pgtype.Int8
 	Type      NullTransactionStatus
 	CreatedAt pgtype.Timestamptz
 }

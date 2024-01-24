@@ -16,8 +16,8 @@ func (store *SeederStore) Account(userId int32) sql.Account {
 			Int32: userId,
 			Valid: true,
 		},
-		Balance: pgtype.Numeric{
-			Int:   utils.GenerateRandomInteger(3),
+		Balance: pgtype.Int8{
+			Int64: utils.GenerateRandomInteger(3),
 			Valid: true,
 		},
 	}

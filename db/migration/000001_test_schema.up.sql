@@ -13,7 +13,7 @@ CREATE TABLE "users" (
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "user_id" int,
-  "balance" decimal,
+  "balance" bigint,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE "account_numbers" (
 CREATE TABLE "transactions" (
   "id" bigserial PRIMARY KEY,
   "account_id" int,
-  "amount" decimal,
+  "amount" bigint,
   "type" transaction_status,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );

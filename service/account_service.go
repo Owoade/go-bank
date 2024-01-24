@@ -4,16 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/big"
 
 	"github.com/Owoade/go-bank/sql"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type TransferCashParams struct {
-	ToAccountId   int64
-	Amount        *big.Int
-	FromAccountId int64
+	FromAccountId int64 `json:"from_account" binding:"required,min=1"`
+	ToAccountId   int64 `json:"to_account" binding:"required,min=1"`
+	Amount        int64 `json:"amount" binding:"required"`
 }
 
 type TransferCashResult struct {
@@ -32,6 +31,41 @@ type TransferCashTransactionCallback struct {
 	Sender    sql.Account
 }
 
+func (s *Service) CreateAccount(ctx context.Context, userId int32) (sql.Account, error) {
+
+	createUserParams := sql.CreateAccountParams{
+		UserID: pgtype.Int4{
+			Int32: userId,
+			Valid: true,
+		},
+		Balance: pgtype.Int8{
+			Int64: 0,
+			Valid: true,
+		},
+	}
+
+	account, err := s.Store.Queries.CreateAccount(ctx, createUserParams)
+
+	return account, err
+
+}
+
+func (s *Service) CreditAccount(ctx context.Context, amount int64, accountId int64) (sql.Account, error) {
+
+	arg := sql.CreditAccountParams{
+		Balance: pgtype.Int8{
+			Int64: amount,
+			Valid: true,
+		},
+		ID: accountId,
+	}
+
+	account, err := s.Store.Queries.CreditAccount(ctx, arg)
+
+	return account, err
+
+}
+
 func (params TransferCashTransactionCallback) transferCashDbTransaction(q *sql.Queries) (interface{}, error) {
 	arg := params.tc_params
 	ctx := params.ctx
@@ -39,8 +73,8 @@ func (params TransferCashTransactionCallback) transferCashDbTransaction(q *sql.Q
 	sender := params.Sender
 	recipient := params.Recipient
 
-	amountValue := pgtype.Numeric{
-		Int:   arg.Amount,
+	amountValue := pgtype.Int8{
+		Int64: arg.Amount,
 		Valid: true,
 	}
 
@@ -133,7 +167,7 @@ func (s *Service) TransferCash(ctx context.Context, arg TransferCashParams) (Tra
 		return zeroValue, fmt.Errorf("faliled to get sender account")
 	}
 
-	expectedBalanceAfterTransaction := sender.Balance.Int.Cmp(arg.Amount)
+	expectedBalanceAfterTransaction := sender.Balance.Int64 - arg.Amount
 
 	if expectedBalanceAfterTransaction < 0 {
 		return zeroValue, fmt.Errorf("insuffucient funds")
@@ -164,4 +198,5 @@ func (s *Service) TransferCash(ctx context.Context, arg TransferCashParams) (Tra
 	}
 
 	return typeCastedResult, nil
+
 }

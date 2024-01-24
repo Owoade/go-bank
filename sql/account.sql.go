@@ -22,7 +22,7 @@ INSERT INTO "accounts" (
 
 type CreateAccountParams struct {
 	UserID  pgtype.Int4
-	Balance pgtype.Numeric
+	Balance pgtype.Int8
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
@@ -42,7 +42,7 @@ UPDATE "accounts" SET balance = balance + $1 WHERE id = $2 RETURNING id, user_id
 `
 
 type CreditAccountParams struct {
-	Balance pgtype.Numeric
+	Balance pgtype.Int8
 	ID      int64
 }
 
@@ -63,7 +63,7 @@ UPDATE "accounts" SET balance = balance - $1 WHERE id = $2 RETURNING id, user_id
 `
 
 type DebitAccountParams struct {
-	Balance pgtype.Numeric
+	Balance pgtype.Int8
 	ID      int64
 }
 

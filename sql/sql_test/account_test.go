@@ -3,7 +3,6 @@ package sql_test
 import (
 	"context"
 	"log"
-	"math/big"
 	"testing"
 
 	"github.com/Owoade/go-bank/sql"
@@ -23,8 +22,8 @@ func TestCreateAccount(t *testing.T) {
 			Int32: user.ID,
 			Valid: true,
 		},
-		Balance: pgtype.Numeric{
-			Int:   utils.GenerateRandomInteger(3),
+		Balance: pgtype.Int8{
+			Int64: utils.GenerateRandomInteger(3),
 			Valid: true,
 		},
 	}
@@ -63,8 +62,8 @@ func TestCreditAccount(t *testing.T) {
 
 	payload := sql.CreditAccountParams{
 		ID: account.ID,
-		Balance: pgtype.Numeric{
-			Int:   randomAmount,
+		Balance: pgtype.Int8{
+			Int64: randomAmount,
 			Valid: true,
 		},
 	}
@@ -75,11 +74,11 @@ func TestCreditAccount(t *testing.T) {
 		log.Fatal("update account query failed")
 	}
 
-	updatedAccountBalance := updatedAccount.Balance.Int
+	updatedAccountBalance := updatedAccount.Balance.Int64
 
-	existingAccountBalance := account.Balance.Int
+	existingAccountBalance := account.Balance.Int64
 
-	balanceDifference := new(big.Int).Sub(updatedAccountBalance, existingAccountBalance)
+	balanceDifference := updatedAccountBalance - existingAccountBalance
 
 	require.NoError(t, err)
 

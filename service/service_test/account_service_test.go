@@ -2,9 +2,7 @@ package service_test
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"math/big"
 	"testing"
 
 	"github.com/Owoade/go-bank/service"
@@ -25,7 +23,7 @@ func TestTransferCash(t *testing.T) {
 	arg := service.TransferCashParams{
 		ToAccountId:   toAccount.ID,
 		FromAccountId: fromAccount.ID,
-		Amount:        big.NewInt(20),
+		Amount:        20,
 	}
 
 	result, err := testService.TransferCash(context.Background(), arg)
@@ -34,13 +32,11 @@ func TestTransferCash(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	creditTransactionAmount := *new(big.Int).Mul(result.CreditTransaction.Amount.Int, big.NewInt(10))
+	creditTransactionAmount := result.CreditTransaction.Amount.Int64
 
-	debitTransactionAmount := *new(big.Int).Mul(result.DebitTransaction.Amount.Int, big.NewInt(10))
+	debitTransactionAmount := result.DebitTransaction.Amount.Int64
 
 	require.NoError(t, err)
-
-	fmt.Println(result.Sender.Balance.Int, arg.Amount)
 
 	require.Equal(t, result.CreditTransaction.Type.TransactionStatus, sql.TransactionStatus("credit"))
 	require.Equal(t, result.CreditTransaction.AccountID.Int32, int32(arg.ToAccountId))
@@ -48,11 +44,10 @@ func TestTransferCash(t *testing.T) {
 	require.Equal(t, result.DebitTransaction.Type.TransactionStatus, sql.TransactionStatus("debit"))
 	require.Equal(t, result.DebitTransaction.AccountID.Int32, int32(arg.FromAccountId))
 
-	fmt.Println(result.CreditTransaction.Amount.Int, arg.Amount, result.CreditTransaction.AccountID.Int32)
-	require.Equal(t, creditTransactionAmount.Cmp(arg.Amount), 0)
-	require.Equal(t, debitTransactionAmount.Cmp(arg.Amount), 0)
+	require.Equal(t, creditTransactionAmount, arg.Amount)
+	require.Equal(t, debitTransactionAmount, arg.Amount)
 
-	require.Equal(t, new(big.Int).Sub(result.Sender.Balance.Int, arg.Amount).Cmp(result.DebitedAccount.Balance.Int), 0)
-	require.Equal(t, new(big.Int).Add(result.Recipient.Balance.Int, arg.Amount).Cmp(result.CreditedAcccount.Balance.Int), 0)
+	require.Equal(t, (result.Sender.Balance.Int64 - arg.Amount), result.DebitedAccount.Balance.Int64)
+	require.Equal(t, (result.Recipient.Balance.Int64 + arg.Amount), result.CreditedAcccount.Balance.Int64)
 
 }

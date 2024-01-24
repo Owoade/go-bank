@@ -23,7 +23,7 @@ INSERT INTO "transactions" (
 
 type CreateTransactionParams struct {
 	AccountID pgtype.Int4
-	Amount    pgtype.Numeric
+	Amount    pgtype.Int8
 	Type      NullTransactionStatus
 }
 

@@ -24,6 +24,12 @@ func NewServer(store *sql.SQLStore) *Server {
 
 	server.router.POST("/auth/signup", server.signup)
 
+	server.router.POST("/bank/account", server.createAccount)
+
+	server.router.POST("/bank/account/credit", server.creditAccount)
+
+	server.router.POST("/bank/account/transfer", server.transferCash)
+
 	return server
 }
 
