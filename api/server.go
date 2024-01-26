@@ -1,23 +1,28 @@
 package api
 
 import (
+	"github.com/Owoade/go-bank/config"
 	"github.com/Owoade/go-bank/service"
 	"github.com/Owoade/go-bank/sql"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	router  *gin.Engine
-	service *service.Service
+	router     *gin.Engine
+	service    *service.Service
+	configVars *config.Variables
 }
 
 func NewServer(store *sql.SQLStore) *Server {
+
+	configVars := config.NewVars()
 
 	server := &Server{
 		router: gin.Default(),
 		service: &service.Service{
 			Store: store,
 		},
+		configVars: configVars,
 	}
 
 	server.router.POST("/auth/login", server.login)
