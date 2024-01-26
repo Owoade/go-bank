@@ -12,8 +12,8 @@ import (
 )
 
 type LoginResponse struct {
-	id    int32
-	token string
+	Id    int32  `json:"id"`
+	Token string `json:"token"`
 }
 
 func (s *Service) Login(email string, password string) (LoginResponse, error) {
@@ -46,8 +46,8 @@ func (s *Service) Login(email string, password string) (LoginResponse, error) {
 	}
 
 	response := LoginResponse{
-		id:    existingUser.ID,
-		token: token,
+		Id:    existingUser.ID,
+		Token: token,
 	}
 
 	return response, nil

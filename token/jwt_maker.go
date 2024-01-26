@@ -14,7 +14,7 @@ type JWTMaker struct {
 
 const minSkLen = 32
 
-func NewJWTMaker(sk []byte) (*JWTMaker, error) {
+func NewJWTMaker(sk string) (*JWTMaker, error) {
 
 	fmt.Println(sk)
 
@@ -22,7 +22,7 @@ func NewJWTMaker(sk []byte) (*JWTMaker, error) {
 		return nil, fmt.Errorf("secret key must be at least %d characters", minSkLen)
 	}
 
-	return &JWTMaker{secretKey: sk}, nil
+	return &JWTMaker{secretKey: []byte(sk)}, nil
 
 }
 

@@ -23,6 +23,8 @@ func NewPasetomaker(key string) (Maker, error) {
 		symetricKey: []byte(key),
 	}
 
+	fmt.Println(maker)
+
 	return maker, nil
 }
 

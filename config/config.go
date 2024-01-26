@@ -17,12 +17,12 @@ func NewVars() *Variables {
 
 	godotenv.Load(".env")
 
-	duration, _ := time.ParseDuration(os.Getenv("PASETO_TOKEN_DURATION"))
+	// duration, _ := time.ParseDuration(os.Getenv("PASETO_TOKEN_DURATION"))
 
 	return &Variables{
 		DbSource:            os.Getenv("DB_URL"),
 		PasetoSymetricToken: os.Getenv(("PASETO_SYMETRIC_TOKEN")),
-		PasetoTokenDuration: time.Now().Add(duration).Sub(time.Now()),
+		PasetoTokenDuration: time.Minute,
 	}
 
 }

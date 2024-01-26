@@ -20,9 +20,9 @@ func NewServer(store *sql.SQLStore) *Server {
 	server := &Server{
 		router: gin.Default(),
 		service: &service.Service{
-			Store: store,
+			Store:      store,
+			ConfigVars: configVars,
 		},
-		configVars: configVars,
 	}
 
 	server.router.POST("/auth/login", server.login)
