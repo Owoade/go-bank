@@ -48,6 +48,9 @@ jobs:
       run: migrate -path db/migration -database "postgres://root:secret@localhost:5432/bank-app?sslmode=disable" -verbose up 
 
     - name: Test
+      env:
+        PASETO_SYMETRIC_TOKEN: ${{ secrets.PASETO_SYMETRIC_TOKEN }}
+        PASETO_TOKEN_DURATION: ${{ secrets.PASETO_TOKEN_DURATION }}
       run: |
         go test ./sql/sql_test
         go test ./service/service_test
