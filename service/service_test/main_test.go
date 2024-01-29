@@ -8,6 +8,7 @@ import (
 
 	"context"
 
+	"github.com/Owoade/go-bank/config"
 	"github.com/Owoade/go-bank/service"
 	"github.com/Owoade/go-bank/sql"
 	"github.com/Owoade/go-bank/sql/seeders"
@@ -35,7 +36,8 @@ func TestMain(m *testing.M) {
 	}
 
 	testService = &service.Service{
-		Store: sql.NewStore(connPool),
+		Store:      sql.NewStore(connPool),
+		ConfigVars: config.NewVars(),
 	}
 
 	fmt.Println(&testService.Store, "test service")
