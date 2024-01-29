@@ -51,3 +51,4 @@ jobs:
       run: |
         go test ./sql/sql_test
         go test ./service/service_test
+        go test ./token/
